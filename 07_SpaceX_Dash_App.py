@@ -1,4 +1,3 @@
-# Import required libraries
 import pandas as pd
 import dash
 from dash import html
@@ -6,7 +5,6 @@ from dash import dcc
 from dash.dependencies import Input, Output
 import plotly.express as px
 
-# Read the airline data into pandas dataframe
 spacex_df = pd.read_csv("spacex_launch_dash.csv")
 max_payload = spacex_df['Payload Mass (kg)'].max()
 min_payload = spacex_df['Payload Mass (kg)'].min()
@@ -56,7 +54,6 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                 ])
 
 # TASK 2:
-# Add a callback function for `site-dropdown` as input, `success-pie-chart` as output
 @app.callback(Output(component_id='success-pie-chart', component_property='figure'),
               Input(component_id='site-dropdown', component_property='value'))
 def get_pie_chart(entered_site):
@@ -67,20 +64,17 @@ def get_pie_chart(entered_site):
         title='Success Count for all launch sites')
         return fig
     else:
-        # return the outcomes piechart for a selected site
         filtered_df=spacex_df[spacex_df['Launch Site']== entered_site]
         filtered_df=filtered_df.groupby(['Launch Site','class']).size().reset_index(name='class count')
         fig=px.pie(filtered_df,values='class count',names='class',title=f"Total Success Launches for site {entered_site}")
         return fig
 
 # TASK 4:
-# Add a callback function for `site-dropdown` and `payload-slider` as inputs, `success-payload-scatter-chart` as output
 @app.callback(Output(component_id='success-payload-scatter-chart',component_property='figure'),
                 [Input(component_id='site-dropdown',component_property='value'),
                 Input(component_id='payload-slider',component_property='value')])
 def scatter(entered_site,payload):
     filtered_df = spacex_df[spacex_df['Payload Mass (kg)'].between(payload[0],payload[1])]
-    # thought reusing filtered_df may cause issues, but tried it out of curiosity and it seems to be working fine
     
     if entered_site=='ALL':
         fig=px.scatter(filtered_df,x='Payload Mass (kg)',y='class',color='Booster Version Category',title='Success count on Payload mass for all sites')
